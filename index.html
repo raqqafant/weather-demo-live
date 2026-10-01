@@ -4,248 +4,370 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>10-Day Weather Forecast – Hamar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #1a2a4a 0%, #2d5986 60%, #4a90c4 100%);
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(160deg, #0f1f3d 0%, #1a3a6b 40%, #1e5a8a 75%, #2980b9 100%);
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       color: #fff;
-      padding: 1rem;
+      padding: 2rem 1rem;
     }
 
+    /* ── Card ── */
     .card {
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      padding: 2rem 2.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 28px;
       width: 100%;
-      max-width: 480px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      max-width: 520px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255,255,255,0.05) inset;
+      overflow: hidden;
+      animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Hero section ── */
+    .hero {
+      padding: 2rem 2rem 1.5rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .location-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .location-pin {
+      font-size: 0.85rem;
+      opacity: 0.6;
     }
 
     .location {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      opacity: 0.7;
-      margin-bottom: 0.25rem;
+      letter-spacing: 0.13em;
+      opacity: 0.6;
     }
 
     .date {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      opacity: 0.9;
+      font-size: 0.95rem;
+      font-weight: 400;
+      opacity: 0.55;
+      margin-bottom: 1.6rem;
     }
 
     .summary {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.75rem;
+      gap: 0.75rem;
+      justify-content: space-between;
+    }
+
+    .summary-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .weather-icon {
-      width: 72px;
-      height: 72px;
+      width: 88px;
+      height: 88px;
       flex-shrink: 0;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
     }
+
+    .temp-block {}
 
     .temp-main {
-      font-size: 3.5rem;
-      font-weight: 700;
+      font-size: 5rem;
+      font-weight: 800;
       line-height: 1;
+      letter-spacing: -0.03em;
     }
 
-    .temp-main span {
-      font-size: 1.5rem;
+    .temp-main sup {
+      font-size: 1.8rem;
       font-weight: 400;
-      opacity: 0.7;
+      opacity: 0.55;
+      vertical-align: super;
+      margin-left: 2px;
     }
 
     .condition {
       font-size: 1rem;
-      opacity: 0.85;
-      margin-top: 0.2rem;
+      font-weight: 500;
+      opacity: 0.75;
+      margin-top: 0.35rem;
       text-transform: capitalize;
+    }
+
+    .temp-range-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    .temp-range-pill .hi { color: #ffd580; }
+    .temp-range-pill .lo { opacity: 0.6; }
+    .temp-range-pill .sep { opacity: 0.3; }
+
+    /* ── Stats grid ── */
+    .body {
+      padding: 1.5rem 2rem;
     }
 
     .stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.85rem;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
     }
 
     .stat {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px;
+      padding: 0.9rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .stat:nth-child(1)::before { background: linear-gradient(90deg, #ffd580, #ff9f43); }
+    .stat:nth-child(2)::before { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+    .stat:nth-child(3)::before { background: linear-gradient(90deg, #81ecec, #00cec9); }
+    .stat:nth-child(4)::before { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+
+    .stat-icon {
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+      display: block;
     }
 
     .stat-label {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      opacity: 0.6;
-      margin-bottom: 0.2rem;
+      opacity: 0.5;
+      margin-bottom: 0.25rem;
     }
 
     .stat-value {
-      font-size: 1.15rem;
-      font-weight: 600;
+      font-size: 1.2rem;
+      font-weight: 700;
     }
 
-    .hourly {
-      margin-top: 1.75rem;
-      overflow-x: auto;
-      padding-bottom: 0.25rem;
-    }
-
-    .hourly-title {
-      font-size: 0.72rem;
+    /* ── Section header ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.68rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.6;
-      margin-bottom: 0.75rem;
+      letter-spacing: 0.12em;
+      opacity: 0.45;
+      margin-bottom: 0.85rem;
     }
+
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 1.75rem 0;
+    }
+
+    /* ── Hourly strip ── */
+    .hourly {
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.2) transparent;
+    }
+
+    .hourly::-webkit-scrollbar { height: 4px; }
+    .hourly::-webkit-scrollbar-track { background: transparent; }
+    .hourly::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
     .hourly-row {
       display: flex;
-      gap: 0.6rem;
+      gap: 0.5rem;
     }
 
     .hour-block {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 0.5rem 0.65rem;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      padding: 0.65rem 0.6rem;
       text-align: center;
       flex: 0 0 auto;
-      min-width: 58px;
+      min-width: 62px;
+      transition: background 0.15s;
+    }
+
+    .hour-block:hover {
+      background: rgba(255,255,255,0.13);
     }
 
     .hour-time {
-      font-size: 0.72rem;
-      opacity: 0.65;
-      margin-bottom: 0.3rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      opacity: 0.5;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.03em;
     }
 
     .hour-icon {
-      width: 28px;
-      height: 28px;
-      margin: 0 auto 0.3rem;
+      width: 30px;
+      height: 30px;
+      margin: 0 auto 0.4rem;
     }
 
     .hour-temp {
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 700;
     }
 
-    .error, .loading {
-      text-align: center;
-      padding: 2rem 0;
-      opacity: 0.8;
-      font-size: 1rem;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .ten-day {
-      margin-top: 1.75rem;
-    }
-
-    .ten-day-title {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.6;
-      margin-bottom: 0.75rem;
-    }
+    /* ── 10-day ── */
+    .ten-day {}
 
     .day-row {
       display: flex;
       align-items: center;
-      padding: 0.55rem 0.75rem;
-      border-radius: 10px;
-      gap: 0.5rem;
+      padding: 0.65rem 0;
+      gap: 0.6rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
-    .day-row:nth-child(odd) {
-      background: rgba(255, 255, 255, 0.07);
-    }
+    .day-row:last-child { border-bottom: none; }
 
     .day-name {
-      flex: 0 0 80px;
-      font-size: 0.9rem;
+      flex: 0 0 90px;
+      font-size: 0.88rem;
       font-weight: 600;
     }
 
     .day-icon {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       flex-shrink: 0;
-    }
-
-    .day-precip {
-      flex: 0 0 48px;
-      font-size: 0.8rem;
-      opacity: 0.7;
-      text-align: right;
     }
 
     .day-bar-wrap {
       flex: 1;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
+      gap: 0.45rem;
+      font-size: 0.82rem;
     }
 
     .day-temp-lo {
-      opacity: 0.6;
-      min-width: 26px;
+      opacity: 0.45;
+      font-weight: 500;
+      min-width: 28px;
       text-align: right;
     }
 
     .day-temp-hi {
-      font-weight: 600;
-      min-width: 26px;
+      font-weight: 700;
+      min-width: 28px;
     }
 
     .bar-track {
       flex: 1;
-      height: 5px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 3px;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
       overflow: hidden;
     }
 
     .bar-fill {
       height: 100%;
-      border-radius: 3px;
-      background: linear-gradient(90deg, #74c0fc, #ff8787);
+      border-radius: 4px;
+      background: linear-gradient(90deg, #74b9ff 0%, #ffd580 50%, #ff7675 100%);
     }
 
-    .source {
-      margin-top: 1.5rem;
-      font-size: 0.7rem;
-      opacity: 0.45;
+    .day-precip {
+      flex: 0 0 44px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      opacity: 0.5;
       text-align: right;
+    }
+
+    .day-precip.has-rain {
+      opacity: 0.85;
+      color: #81ecec;
+    }
+
+    /* ── Loading / Error ── */
+    .loading, .error {
+      text-align: center;
+      padding: 3rem 2rem;
+      opacity: 0.8;
+      font-size: 1rem;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 2.5px solid rgba(255,255,255,0.2);
+      border-top-color: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ── */
+    .source {
+      padding: 1rem 2rem;
+      font-size: 0.68rem;
+      font-weight: 500;
+      opacity: 0.3;
+      text-align: right;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      letter-spacing: 0.03em;
     }
   </style>
 </head>
@@ -262,25 +384,24 @@
     const LON = 11.0680;
     const LOCATION = "Hamar, Norway";
 
-    // MET Norway symbol-code → emoji (subset)
     const SYMBOL_EMOJI = {
-      clearsky:        "☀️",
-      fair:            "🌤️",
-      partlycloudy:    "⛅",
-      cloudy:          "☁️",
-      fog:             "🌫️",
-      lightrain:       "🌦️",
-      rain:            "🌧️",
-      heavyrain:       "🌧️",
-      rainshowers:     "🌦️",
-      heavyrainshowers:"🌧️",
-      sleet:           "🌨️",
-      lightsleet:      "🌨️",
-      snow:            "❄️",
-      lightsnow:       "🌨️",
-      heavysnow:       "❄️",
-      snowshowers:     "🌨️",
-      thunder:         "⛈️",
+      clearsky:            "☀️",
+      fair:                "🌤️",
+      partlycloudy:        "⛅",
+      cloudy:              "☁️",
+      fog:                 "🌫️",
+      lightrain:           "🌦️",
+      rain:                "🌧️",
+      heavyrain:           "🌧️",
+      rainshowers:         "🌦️",
+      heavyrainshowers:    "🌧️",
+      sleet:               "🌨️",
+      lightsleet:          "🌨️",
+      snow:                "❄️",
+      lightsnow:           "🌨️",
+      heavysnow:           "❄️",
+      snowshowers:         "🌨️",
+      thunder:             "⛈️",
       lightsnowandthunder: "⛈️",
     };
 
@@ -295,9 +416,7 @@
 
     function symbolToLabel(code) {
       if (!code) return "—";
-      return code
-        .replace(/_day$|_night$|_polartwilight$/, "")
-        .replace(/_/g, " ");
+      return code.replace(/_day$|_night$|_polartwilight$/, "").replace(/_/g, " ");
     }
 
     function iconUrl(code) {
@@ -305,27 +424,30 @@
       return `https://api.met.no/images/weathericons/svg/${code}.svg`;
     }
 
-    function dateOffset(offset) {
+    function dateOffset(n) {
       const d = new Date();
-      d.setDate(d.getDate() + offset);
+      d.setDate(d.getDate() + n);
       return d.toISOString().slice(0, 10);
     }
 
-    function formatDate(isoDate) {
-      const d = new Date(isoDate + "T12:00:00");
-      return d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    function formatDate(iso) {
+      return new Date(iso + "T12:00:00").toLocaleDateString("en-GB", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric"
+      });
     }
 
-    function shortDay(isoDate) {
-      const d = new Date(isoDate + "T12:00:00");
-      return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+    function shortDay(iso, index) {
+      if (index === 0) return "Tomorrow";
+      return new Date(iso + "T12:00:00").toLocaleDateString("en-GB", {
+        weekday: "short", day: "numeric", month: "short"
+      });
     }
 
     async function fetchForecast() {
-      const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${LAT}&lon=${LON}`;
-      const res = await fetch(url, {
-        headers: { "User-Agent": "weather-demo-hamar/1.0 toreinar.skarderud@gmail.com" }
-      });
+      const res = await fetch(
+        `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${LAT}&lon=${LON}`,
+        { headers: { "User-Agent": "weather-demo-hamar/1.0 toreinar.skarderud@gmail.com" } }
+      );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
     }
@@ -336,148 +458,144 @@
       const inst = midday.data.instant.details;
       const next6 = midday.data.next_6_hours || midday.data.next_12_hours || {};
       const symbol = next6.summary?.symbol_code
-        || entries[0].data.next_6_hours?.summary?.symbol_code
-        || null;
+        || entries[0].data.next_6_hours?.summary?.symbol_code || null;
       const temps = entries.map(t => t.data.instant.details.air_temperature);
-      let totalPrecip = 0;
+      let precip = 0;
       for (const e of entries) {
-        totalPrecip += e.data.next_1_hours?.details?.precipitation_amount
-          ?? e.data.next_6_hours?.details?.precipitation_amount
-          ?? 0;
+        precip += e.data.next_1_hours?.details?.precipitation_amount
+          ?? e.data.next_6_hours?.details?.precipitation_amount ?? 0;
       }
       return {
         symbol,
-        tempMin: Math.round(Math.min(...temps)),
-        tempMax: Math.round(Math.max(...temps)),
-        precipitation: Math.round(totalPrecip * 10) / 10,
-        windSpeed: Math.round(inst.wind_speed * 10) / 10,
-        humidity: Math.round(inst.relative_humidity),
+        tempMin:       Math.round(Math.min(...temps)),
+        tempMax:       Math.round(Math.max(...temps)),
+        precipitation: Math.round(precip * 10) / 10,
+        windSpeed:     Math.round(inst.wind_speed * 10) / 10,
+        humidity:      Math.round(inst.relative_humidity),
       };
     }
 
     function processData(data) {
-      const timeseries = data.properties.timeseries;
-
-      // Build per-day buckets for days +1 … +10
+      const ts = data.properties.timeseries;
       const days = [];
-      for (let offset = 1; offset <= 10; offset++) {
-        const isoDate = dateOffset(offset);
-        const entries = timeseries.filter(t => t.time.startsWith(isoDate));
-        if (entries.length) days.push({ date: isoDate, ...summariseDay(entries) });
+      for (let i = 1; i <= 10; i++) {
+        const date = dateOffset(i);
+        const entries = ts.filter(t => t.time.startsWith(date));
+        if (entries.length) days.push({ date, ...summariseDay(entries) });
       }
-
       if (!days.length) throw new Error("No forecast data available.");
 
-      const tomorrow = days[0];
-      const tomorrowEntries = timeseries.filter(t => t.time.startsWith(tomorrow.date));
-      const midday = tomorrowEntries.find(t => t.time.includes("T12:00:00Z"))
-        || tomorrowEntries[Math.floor(tomorrowEntries.length / 2)];
+      const tmrw = days[0];
+      const tmrwEntries = ts.filter(t => t.time.startsWith(tmrw.date));
+      const midday = tmrwEntries.find(t => t.time.includes("T12:00:00Z"))
+        || tmrwEntries[Math.floor(tmrwEntries.length / 2)];
       const inst = midday.data.instant.details;
 
-      // Hourly slots for tomorrow: every 3 hours
-      const hourlySlots = tomorrowEntries.filter((_, i) => i % 3 === 0).slice(0, 8);
-
       return {
-        ...tomorrow,
-        tempNow: Math.round(inst.air_temperature),
-        cloudCover: Math.round(inst.cloud_area_fraction),
-        hourly: hourlySlots.map(entry => ({
-          time: new Date(entry.time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Oslo" }),
-          temp: Math.round(entry.data.instant.details.air_temperature),
-          symbol: entry.data.next_1_hours?.summary?.symbol_code
-            || entry.data.next_6_hours?.summary?.symbol_code
-            || null,
+        ...tmrw,
+        tempNow:  Math.round(inst.air_temperature),
+        hourly: tmrwEntries.filter((_, i) => i % 3 === 0).slice(0, 8).map(e => ({
+          time:   new Date(e.time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Oslo" }),
+          temp:   Math.round(e.data.instant.details.air_temperature),
+          symbol: e.data.next_1_hours?.summary?.symbol_code
+               || e.data.next_6_hours?.summary?.symbol_code || null,
         })),
         tenDay: days,
       };
     }
 
+    function img(cls, code, fallback) {
+      const url = iconUrl(code);
+      if (!url) return `<span style="font-size:1.8rem;line-height:1">${symbolToEmoji(code)}</span>`;
+      return `<img class="${cls}" src="${url}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${symbolToEmoji(code)}',style:'font-size:${fallback}'}))">`;
+    }
+
     function render(f) {
-      // Temperature range across all 10 days for proportional bar
       const allMin = Math.min(...f.tenDay.map(d => d.tempMin));
       const allMax = Math.max(...f.tenDay.map(d => d.tempMax));
-      const range = allMax - allMin || 1;
+      const range  = allMax - allMin || 1;
+
+      const hourlyHtml = f.hourly.map(h => `
+        <div class="hour-block">
+          <div class="hour-time">${h.time}</div>
+          ${img("hour-icon", h.symbol, "1.4rem")}
+          <div class="hour-temp">${h.temp}°</div>
+        </div>`).join("");
 
       const tenDayHtml = f.tenDay.map((d, i) => {
-        const dIcon = iconUrl(d.symbol);
-        const dIconHtml = dIcon
-          ? `<img class="day-icon" src="${dIcon}" alt="" onerror="this.replaceWith(document.createTextNode('${symbolToEmoji(d.symbol)}'))">`
-          : `<span style="font-size:1.2rem">${symbolToEmoji(d.symbol)}</span>`;
-        const barLeft  = ((d.tempMin - allMin) / range * 100).toFixed(1);
-        const barWidth = ((d.tempMax - d.tempMin) / range * 100).toFixed(1);
-        const label = i === 0 ? "Tomorrow" : shortDay(d.date);
+        const left  = ((d.tempMin - allMin) / range * 100).toFixed(1);
+        const width = ((d.tempMax - d.tempMin) / range * 100).toFixed(1);
+        const hasRain = d.precipitation > 0;
         return `
           <div class="day-row">
-            <div class="day-name">${label}</div>
-            ${dIconHtml}
+            <div class="day-name">${shortDay(d.date, i)}</div>
+            ${img("day-icon", d.symbol, "1.2rem")}
             <div class="day-bar-wrap">
               <div class="day-temp-lo">${d.tempMin}°</div>
-              <div class="bar-track">
-                <div class="bar-fill" style="margin-left:${barLeft}%;width:${barWidth}%"></div>
-              </div>
+              <div class="bar-track"><div class="bar-fill" style="margin-left:${left}%;width:${width}%"></div></div>
               <div class="day-temp-hi">${d.tempMax}°</div>
             </div>
-            <div class="day-precip">${d.precipitation > 0 ? d.precipitation + ' mm' : '—'}</div>
-          </div>`;
-      }).join("");
-
-      const icon = iconUrl(f.symbol);
-      const iconHtml = icon
-        ? `<img class="weather-icon" src="${icon}" alt="${f.symbol}" onerror="this.replaceWith(document.createTextNode('${symbolToEmoji(f.symbol)}'))">`
-        : `<span style="font-size:3rem">${symbolToEmoji(f.symbol)}</span>`;
-
-      const hourlyHtml = f.hourly.map(h => {
-        const hIcon = iconUrl(h.symbol);
-        const hIconHtml = hIcon
-          ? `<img class="hour-icon" src="${hIcon}" alt="" onerror="this.replaceWith(document.createTextNode('${symbolToEmoji(h.symbol)}'))">`
-          : `<div style="font-size:1.4rem;line-height:28px">${symbolToEmoji(h.symbol)}</div>`;
-        return `
-          <div class="hour-block">
-            <div class="hour-time">${h.time}</div>
-            ${hIconHtml}
-            <div class="hour-temp">${h.temp}°</div>
+            <div class="day-precip${hasRain ? ' has-rain' : ''}">${hasRain ? d.precipitation + ' mm' : '—'}</div>
           </div>`;
       }).join("");
 
       document.getElementById("app").innerHTML = `
-        <div class="location">${LOCATION}</div>
-        <div class="date">${formatDate(f.date)}</div>
+        <div class="hero">
+          <div class="location-row">
+            <span class="location-pin">📍</span>
+            <span class="location">${LOCATION}</span>
+          </div>
+          <div class="date">${formatDate(f.date)}</div>
 
-        <div class="summary">
-          ${iconHtml}
-          <div>
-            <div class="temp-main">${f.tempMax}°<span>C</span></div>
-            <div class="condition">${symbolToLabel(f.symbol)}</div>
+          <div class="summary">
+            <div class="summary-left">
+              ${img("weather-icon", f.symbol, "3rem")}
+              <div class="temp-block">
+                <div class="temp-main">${f.tempMax}<sup>°C</sup></div>
+                <div class="condition">${symbolToLabel(f.symbol)}</div>
+                <div class="temp-range-pill">
+                  <span class="hi">↑ ${f.tempMax}°</span>
+                  <span class="sep">/</span>
+                  <span class="lo">↓ ${f.tempMin}°</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="stats">
-          <div class="stat">
-            <div class="stat-label">High / Low</div>
-            <div class="stat-value">${f.tempMax}° / ${f.tempMin}°</div>
+        <div class="body">
+          <div class="stats">
+            <div class="stat">
+              <span class="stat-icon">💨</span>
+              <div class="stat-label">Wind</div>
+              <div class="stat-value">${f.windSpeed} m/s</div>
+            </div>
+            <div class="stat">
+              <span class="stat-icon">🌧️</span>
+              <div class="stat-label">Precipitation</div>
+              <div class="stat-value">${f.precipitation > 0 ? f.precipitation + ' mm' : '0 mm'}</div>
+            </div>
+            <div class="stat">
+              <span class="stat-icon">💧</span>
+              <div class="stat-label">Humidity</div>
+              <div class="stat-value">${f.humidity}%</div>
+            </div>
+            <div class="stat">
+              <span class="stat-icon">🌡️</span>
+              <div class="stat-label">Feels like</div>
+              <div class="stat-value">${f.tempNow}°C</div>
+            </div>
           </div>
-          <div class="stat">
-            <div class="stat-label">Wind</div>
-            <div class="stat-value">${f.windSpeed} m/s</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">Precipitation</div>
-            <div class="stat-value">${f.precipitation} mm</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">Humidity</div>
-            <div class="stat-value">${f.humidity}%</div>
-          </div>
-        </div>
 
-        <div class="hourly">
-          <div class="hourly-title">Hourly – every 3 h</div>
-          <div class="hourly-row">${hourlyHtml}</div>
-        </div>
+          <div class="section-header">Hourly – every 3 h</div>
+          <div class="hourly">
+            <div class="hourly-row">${hourlyHtml}</div>
+          </div>
 
-        <div class="ten-day">
-          <div class="ten-day-title">10-day forecast</div>
-          ${tenDayHtml}
+          <div class="divider"></div>
+
+          <div class="section-header">10-day forecast</div>
+          <div class="ten-day">${tenDayHtml}</div>
         </div>
 
         <div class="source">Data: MET Norway / Meteorologisk institutt</div>
@@ -487,16 +605,14 @@
     function renderError(msg) {
       document.getElementById("app").innerHTML = `
         <div class="error">
-          <div style="font-size:2rem;margin-bottom:0.5rem">⚠️</div>
+          <div style="font-size:2.5rem;margin-bottom:0.75rem">⚠️</div>
           <div>${msg}</div>
         </div>`;
     }
 
     (async () => {
       try {
-        const data = await fetchForecast();
-        const forecast = processData(data);
-        render(forecast);
+        render(processData(await fetchForecast()));
       } catch (err) {
         renderError(err.message || "Could not load forecast.");
         console.error(err);
