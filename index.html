@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tomorrow's Weather – Hamar</title>
+  <title>10-Day Weather Forecast – Hamar</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -165,6 +165,82 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .ten-day {
+      margin-top: 1.75rem;
+    }
+
+    .ten-day-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+      margin-bottom: 0.75rem;
+    }
+
+    .day-row {
+      display: flex;
+      align-items: center;
+      padding: 0.55rem 0.75rem;
+      border-radius: 10px;
+      gap: 0.5rem;
+    }
+
+    .day-row:nth-child(odd) {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .day-name {
+      flex: 0 0 80px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .day-icon {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .day-precip {
+      flex: 0 0 48px;
+      font-size: 0.8rem;
+      opacity: 0.7;
+      text-align: right;
+    }
+
+    .day-bar-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .day-temp-lo {
+      opacity: 0.6;
+      min-width: 26px;
+      text-align: right;
+    }
+
+    .day-temp-hi {
+      font-weight: 600;
+      min-width: 26px;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #74c0fc, #ff8787);
+    }
+
     .source {
       margin-top: 1.5rem;
       font-size: 0.7rem;
@@ -229,15 +305,20 @@
       return `https://api.met.no/images/weathericons/svg/${code}.svg`;
     }
 
-    function tomorrow() {
+    function dateOffset(offset) {
       const d = new Date();
-      d.setDate(d.getDate() + 1);
-      return d.toISOString().slice(0, 10); // YYYY-MM-DD
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().slice(0, 10);
     }
 
     function formatDate(isoDate) {
       const d = new Date(isoDate + "T12:00:00");
       return d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    }
+
+    function shortDay(isoDate) {
+      const d = new Date(isoDate + "T12:00:00");
+      return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
     }
 
     async function fetchForecast() {
@@ -249,53 +330,56 @@
       return res.json();
     }
 
-    function processData(data) {
-      const tomorrowDate = tomorrow();
-      const timeseries = data.properties.timeseries;
-
-      // Filter entries for tomorrow
-      const tomorrowEntries = timeseries.filter(t =>
-        t.time.startsWith(tomorrowDate)
-      );
-
-      if (!tomorrowEntries.length) throw new Error("No forecast data for tomorrow.");
-
-      // Pick midday (12:00) as the "headline" reading
-      const midday = tomorrowEntries.find(t => t.time.includes("T12:00:00Z"))
-        || tomorrowEntries[Math.floor(tomorrowEntries.length / 2)];
-
+    function summariseDay(entries) {
+      const midday = entries.find(t => t.time.includes("T12:00:00Z"))
+        || entries[Math.floor(entries.length / 2)];
       const inst = midday.data.instant.details;
       const next6 = midday.data.next_6_hours || midday.data.next_12_hours || {};
       const symbol = next6.summary?.symbol_code
-        || tomorrowEntries[0].data.next_6_hours?.summary?.symbol_code
+        || entries[0].data.next_6_hours?.summary?.symbol_code
         || null;
-
-      // Min/max temperature across the day
-      const temps = tomorrowEntries.map(t => t.data.instant.details.air_temperature);
-      const tempMin = Math.round(Math.min(...temps));
-      const tempMax = Math.round(Math.max(...temps));
-
-      // Total precipitation for the day (sum of next_1_hours or next_6_hours)
+      const temps = entries.map(t => t.data.instant.details.air_temperature);
       let totalPrecip = 0;
-      for (const entry of tomorrowEntries) {
-        const p = entry.data.next_1_hours?.details?.precipitation_amount
-          ?? entry.data.next_6_hours?.details?.precipitation_amount
+      for (const e of entries) {
+        totalPrecip += e.data.next_1_hours?.details?.precipitation_amount
+          ?? e.data.next_6_hours?.details?.precipitation_amount
           ?? 0;
-        totalPrecip += p;
+      }
+      return {
+        symbol,
+        tempMin: Math.round(Math.min(...temps)),
+        tempMax: Math.round(Math.max(...temps)),
+        precipitation: Math.round(totalPrecip * 10) / 10,
+        windSpeed: Math.round(inst.wind_speed * 10) / 10,
+        humidity: Math.round(inst.relative_humidity),
+      };
+    }
+
+    function processData(data) {
+      const timeseries = data.properties.timeseries;
+
+      // Build per-day buckets for days +1 … +10
+      const days = [];
+      for (let offset = 1; offset <= 10; offset++) {
+        const isoDate = dateOffset(offset);
+        const entries = timeseries.filter(t => t.time.startsWith(isoDate));
+        if (entries.length) days.push({ date: isoDate, ...summariseDay(entries) });
       }
 
-      // Hourly slots: every 3 hours
+      if (!days.length) throw new Error("No forecast data available.");
+
+      const tomorrow = days[0];
+      const tomorrowEntries = timeseries.filter(t => t.time.startsWith(tomorrow.date));
+      const midday = tomorrowEntries.find(t => t.time.includes("T12:00:00Z"))
+        || tomorrowEntries[Math.floor(tomorrowEntries.length / 2)];
+      const inst = midday.data.instant.details;
+
+      // Hourly slots for tomorrow: every 3 hours
       const hourlySlots = tomorrowEntries.filter((_, i) => i % 3 === 0).slice(0, 8);
 
       return {
-        date: tomorrowDate,
-        symbol,
+        ...tomorrow,
         tempNow: Math.round(inst.air_temperature),
-        tempMin,
-        tempMax,
-        windSpeed: Math.round(inst.wind_speed * 10) / 10,
-        humidity: Math.round(inst.relative_humidity),
-        precipitation: Math.round(totalPrecip * 10) / 10,
         cloudCover: Math.round(inst.cloud_area_fraction),
         hourly: hourlySlots.map(entry => ({
           time: new Date(entry.time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Oslo" }),
@@ -304,10 +388,39 @@
             || entry.data.next_6_hours?.summary?.symbol_code
             || null,
         })),
+        tenDay: days,
       };
     }
 
     function render(f) {
+      // Temperature range across all 10 days for proportional bar
+      const allMin = Math.min(...f.tenDay.map(d => d.tempMin));
+      const allMax = Math.max(...f.tenDay.map(d => d.tempMax));
+      const range = allMax - allMin || 1;
+
+      const tenDayHtml = f.tenDay.map((d, i) => {
+        const dIcon = iconUrl(d.symbol);
+        const dIconHtml = dIcon
+          ? `<img class="day-icon" src="${dIcon}" alt="" onerror="this.replaceWith(document.createTextNode('${symbolToEmoji(d.symbol)}'))">`
+          : `<span style="font-size:1.2rem">${symbolToEmoji(d.symbol)}</span>`;
+        const barLeft  = ((d.tempMin - allMin) / range * 100).toFixed(1);
+        const barWidth = ((d.tempMax - d.tempMin) / range * 100).toFixed(1);
+        const label = i === 0 ? "Tomorrow" : shortDay(d.date);
+        return `
+          <div class="day-row">
+            <div class="day-name">${label}</div>
+            ${dIconHtml}
+            <div class="day-bar-wrap">
+              <div class="day-temp-lo">${d.tempMin}°</div>
+              <div class="bar-track">
+                <div class="bar-fill" style="margin-left:${barLeft}%;width:${barWidth}%"></div>
+              </div>
+              <div class="day-temp-hi">${d.tempMax}°</div>
+            </div>
+            <div class="day-precip">${d.precipitation > 0 ? d.precipitation + ' mm' : '—'}</div>
+          </div>`;
+      }).join("");
+
       const icon = iconUrl(f.symbol);
       const iconHtml = icon
         ? `<img class="weather-icon" src="${icon}" alt="${f.symbol}" onerror="this.replaceWith(document.createTextNode('${symbolToEmoji(f.symbol)}'))">`
@@ -360,6 +473,11 @@
         <div class="hourly">
           <div class="hourly-title">Hourly – every 3 h</div>
           <div class="hourly-row">${hourlyHtml}</div>
+        </div>
+
+        <div class="ten-day">
+          <div class="ten-day-title">10-day forecast</div>
+          ${tenDayHtml}
         </div>
 
         <div class="source">Data: MET Norway / Meteorologisk institutt</div>
