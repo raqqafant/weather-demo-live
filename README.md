@@ -25,3 +25,23 @@ https://raqqafant.github.io/weather-demo-live/
 ## Run locally
 
 Open `index.html` in a browser — no build step or server needed.
+
+## Harness (KIUA-2003)
+
+This repo also follows the course structure: `SPEC.md` (problem, users, definition of success),
+`CLAUDE.md` (how to work here), `tasks/` (one task per file with an acceptance check),
+`harness/` (stages), `eval/` (checks), `fixtures/` (saved real inputs), `docs/meetings/`
+and `docs/prompt-log.md`.
+
+### Normal run
+```
+python3 harness/probe.py            # fetches the MET forecast -> out/probe.json
+```
+
+### Eval run
+```
+python3 eval/check_probe.py         # prints PASS, exit 0
+python3 harness/probe.py --offline && python3 eval/check_probe.py   # from fixtures/
+```
+
+One task = one branch = one PR. Never edit `eval/` to make a check pass.
