@@ -443,13 +443,37 @@
       });
     }
 
+    // MET terms: browsers cannot set User-Agent, so the request stays a "simple"
+    // CORS request and the browser's Origin header identifies this site.
+    // Cache the response until its Expires time so we don't re-request too often.
+    const CACHE_KEY = `met-forecast-${LAT}-${LON}`;
+    const FALLBACK_TTL_MS = 30 * 60 * 1000;
+
+    function readCache() {
+      try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch { return null; }
+    }
+
+    function writeCache(data, expiresAt) {
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data, expiresAt })); } catch {}
+    }
+
     async function fetchForecast() {
-      const res = await fetch(
-        `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${LAT}&lon=${LON}`,
-        { headers: { "User-Agent": "weather-demo-hamar/1.0 toreinar.skarderud@gmail.com" } }
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
+      const cached = readCache();
+      if (cached && Date.now() < cached.expiresAt) return cached.data;
+
+      try {
+        const res = await fetch(
+          `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${LAT}&lon=${LON}`
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const expires = Date.parse(res.headers.get("Expires"));
+        writeCache(data, Number.isNaN(expires) ? Date.now() + FALLBACK_TTL_MS : expires);
+        return data;
+      } catch (err) {
+        if (cached) return cached.data;   // stale data beats an error page
+        throw err;
+      }
     }
 
     function summariseDay(entries) {
