@@ -6,6 +6,7 @@ Usage:
   python3 harness/render.py   # reads fixtures/met_hamar.json
 """
 import json
+import shutil
 from datetime import date, datetime, timedelta
 from html import escape
 from pathlib import Path
@@ -14,6 +15,7 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "fixtures" / "met_hamar.json"
 OUT = ROOT / "out" / "index.html"
+ICONS = Path(__file__).resolve().parent / "icons"   # metno/weathericons, MIT
 CSS = (Path(__file__).resolve().parent / "style.css").read_text(encoding="utf-8")
 
 TZ = ZoneInfo("Europe/Oslo")
@@ -118,10 +120,21 @@ def process(raw, today=None):
 # ── html ──────────────────────────────────────────────────────────────────
 
 def icon(cls, code):
-    if not code:
-        return f'<span style="font-size:1.8rem;line-height:1">{symbol_emoji(code)}</span>'
-    url = f"https://api.met.no/images/weathericons/svg/{escape(code)}.svg"
-    return f'<img class="{cls}" src="{url}" alt="{escape(symbol_label(code))}">'
+    """Local MET icon (copied to out/icons/), emoji if the code has no icon."""
+    if not code or not (ICONS / f"{code}.svg").exists():
+        return f'<span class="{cls}" style="font-size:1.8rem;line-height:1">{symbol_emoji(code)}</span>'
+    return f'<img class="{cls}" src="icons/{escape(code)}.svg" alt="{escape(symbol_label(code))}">'
+
+
+def copy_icons(f):
+    used = {f["tomorrow"]["symbol"]}
+    used |= {h["symbol"] for h in f["hourly"]} | {d["symbol"] for d in f["ten_day"]}
+    dest = OUT.parent / "icons"
+    dest.mkdir(parents=True, exist_ok=True)
+    for code in filter(None, used):
+        src = ICONS / f"{code}.svg"
+        if src.exists():
+            shutil.copy2(src, dest / src.name)
 
 
 def long_date(d: date):
@@ -227,7 +240,9 @@ def main():
     with open(FIXTURE, encoding="utf-8") as fh:
         raw = json.load(fh)
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(render(process(raw)), encoding="utf-8")
+    forecast = process(raw)
+    copy_icons(forecast)
+    OUT.write_text(render(forecast), encoding="utf-8")
     print(f"render: wrote {OUT.relative_to(ROOT)}")
 
 
