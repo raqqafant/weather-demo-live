@@ -20,7 +20,7 @@ ICONS = Path(__file__).resolve().parent / "icons"   # metno/weathericons, MIT
 CSS = (Path(__file__).resolve().parent / "style.css").read_text(encoding="utf-8")
 
 TZ = ZoneInfo("Europe/Oslo")
-LOCATION = "Hamar, Norway"
+LOCATION = "Hamar, Norge"
 DAYS = 10
 
 SYMBOL_EMOJI = {
@@ -150,12 +150,25 @@ def copy_icons(f):
             shutil.copy2(src, dest / src.name)
 
 
+# Norwegian names written out, so the page does not depend on the OS locale
+WEEKDAYS = ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"]
+MONTHS = ["januar", "februar", "mars", "april", "mai", "juni", "juli",
+          "august", "september", "oktober", "november", "desember"]
+
+
+def num(x):
+    """Norwegian decimal comma: 4.7 -> '4,7'."""
+    return f"{x:g}".replace(".", ",")
+
+
 def long_date(d: date):
-    return f"{d.strftime('%A')} {d.day} {d.strftime('%B %Y')}"
+    return f"{WEEKDAYS[d.weekday()].capitalize()} {d.day}. {MONTHS[d.month - 1]} {d.year}"
 
 
 def short_day(d: date, i):
-    return "Tomorrow" if i == 0 else f"{d.strftime('%a')} {d.day} {d.strftime('%b')}"
+    if i == 0:
+        return "I morgen"
+    return f"{WEEKDAYS[d.weekday()][:3].capitalize()} {d.day}. {MONTHS[d.month - 1][:3]}"
 
 
 def render(f, generated_at=None):
@@ -186,15 +199,15 @@ def render(f, generated_at=None):
               <div class="bar-track"><div class="bar-fill" style="margin-left:{left:.1f}%;width:{width:.1f}%"></div></div>
               <div class="day-temp-hi">{d['temp_max']}°</div>
             </div>
-            <div class="day-precip{' has-rain' if rain else ''}">{f"{d['precipitation']} mm" if rain else '—'}</div>
+            <div class="day-precip{' has-rain' if rain else ''}">{f"{num(d['precipitation'])} mm" if rain else '—'}</div>
           </div>""")
 
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="nb">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>10-Day Weather Forecast – Hamar</title>
+  <title>Værvarsel for Hamar – 10 dager</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -227,22 +240,22 @@ def render(f, generated_at=None):
 
     <div class="body">
       <div class="stats">
-        <div class="stat"><span class="stat-icon">💨</span><div class="stat-label">Wind</div><div class="stat-value">{t['wind_speed']} m/s</div></div>
-        <div class="stat"><span class="stat-icon">🌧️</span><div class="stat-label">Precipitation</div><div class="stat-value">{t['precipitation']} mm</div></div>
-        <div class="stat"><span class="stat-icon">💧</span><div class="stat-label">Humidity</div><div class="stat-value">{t['humidity']}%</div></div>
-        <div class="stat"><span class="stat-icon">🌡️</span><div class="stat-label">At midday</div><div class="stat-value">{t['midday_temp']}°C</div></div>
+        <div class="stat"><span class="stat-icon">💨</span><div class="stat-label">Vind</div><div class="stat-value">{num(t['wind_speed'])} m/s</div></div>
+        <div class="stat"><span class="stat-icon">🌧️</span><div class="stat-label">Nedbør</div><div class="stat-value">{num(t['precipitation'])} mm</div></div>
+        <div class="stat"><span class="stat-icon">💧</span><div class="stat-label">Luftfuktighet</div><div class="stat-value">{t['humidity']}%</div></div>
+        <div class="stat"><span class="stat-icon">🌡️</span><div class="stat-label">Kl. 12</div><div class="stat-value">{t['midday_temp']}°C</div></div>
       </div>
 
-      <div class="section-header">Hourly – every 3 h</div>
+      <div class="section-header">Time for time – hver 3. time</div>
       <div class="hourly"><div class="hourly-row">{hourly_html}</div></div>
 
       <div class="divider"></div>
 
-      <div class="section-header">10-day forecast</div>
+      <div class="section-header">Varsel 10 dager</div>
       <div class="ten-day">{''.join(rows)}</div>
     </div>
 
-    <div class="source">Data: MET Norway / Meteorologisk institutt (CC BY 4.0) · updated {generated_at:%d.%m.%Y %H:%M}</div>
+    <div class="source">Data: Meteorologisk institutt (MET Norway), CC BY 4.0 · oppdatert {generated_at:%d.%m.%Y kl. %H:%M}</div>
   </div>
 </body>
 </html>
