@@ -1,0 +1,362 @@
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(160deg, #0f1f3d 0%, #1a3a6b 40%, #1e5a8a 75%, #2980b9 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      color: #fff;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 28px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255,255,255,0.05) inset;
+      overflow: hidden;
+      animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Hero section ── */
+    .hero {
+      padding: 2rem 2rem 1.5rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .location-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .location-pin {
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
+
+    .location {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      opacity: 0.6;
+    }
+
+    .date {
+      font-size: 0.95rem;
+      font-weight: 400;
+      opacity: 0.55;
+      margin-bottom: 1.6rem;
+    }
+
+    .summary {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: space-between;
+    }
+
+    .summary-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .weather-icon {
+      width: 88px;
+      height: 88px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    }
+
+    .temp-block {}
+
+    .temp-main {
+      font-size: 5rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .temp-main sup {
+      font-size: 1.8rem;
+      font-weight: 400;
+      opacity: 0.55;
+      vertical-align: super;
+      margin-left: 2px;
+    }
+
+    .condition {
+      font-size: 1rem;
+      font-weight: 500;
+      opacity: 0.75;
+      margin-top: 0.35rem;
+      text-transform: capitalize;
+    }
+
+    .temp-range-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    .temp-range-pill .hi { color: #ffd580; }
+    .temp-range-pill .lo { opacity: 0.6; }
+    .temp-range-pill .sep { opacity: 0.3; }
+
+    /* ── Stats grid ── */
+    .body {
+      padding: 1.5rem 2rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px;
+      padding: 0.9rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .stat:nth-child(1)::before { background: linear-gradient(90deg, #ffd580, #ff9f43); }
+    .stat:nth-child(2)::before { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+    .stat:nth-child(3)::before { background: linear-gradient(90deg, #81ecec, #00cec9); }
+    .stat:nth-child(4)::before { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+
+    .stat-icon {
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.45;
+      margin-bottom: 0.85rem;
+    }
+
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 1.75rem 0;
+    }
+
+    /* ── Hourly strip ── */
+    .hourly {
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.2) transparent;
+    }
+
+    .hourly::-webkit-scrollbar { height: 4px; }
+    .hourly::-webkit-scrollbar-track { background: transparent; }
+    .hourly::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+    .hourly-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .hour-block {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      padding: 0.65rem 0.6rem;
+      text-align: center;
+      flex: 0 0 auto;
+      min-width: 62px;
+      transition: background 0.15s;
+    }
+
+    .hour-block:hover {
+      background: rgba(255,255,255,0.13);
+    }
+
+    .hour-time {
+      font-size: 0.68rem;
+      font-weight: 600;
+      opacity: 0.5;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.03em;
+    }
+
+    .hour-icon {
+      width: 30px;
+      height: 30px;
+      margin: 0 auto 0.4rem;
+    }
+
+    .hour-temp {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    /* ── 10-day ── */
+    .ten-day {}
+
+    .day-row {
+      display: flex;
+      align-items: center;
+      padding: 0.65rem 0;
+      gap: 0.6rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .day-row:last-child { border-bottom: none; }
+
+    .day-name {
+      flex: 0 0 90px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .day-icon {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .day-bar-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+    }
+
+    .day-temp-lo {
+      opacity: 0.45;
+      font-weight: 500;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    .day-temp-hi {
+      font-weight: 700;
+      min-width: 28px;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #74b9ff 0%, #ffd580 50%, #ff7675 100%);
+    }
+
+    .day-precip {
+      flex: 0 0 44px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      opacity: 0.5;
+      text-align: right;
+    }
+
+    .day-precip.has-rain {
+      opacity: 0.85;
+      color: #81ecec;
+    }
+
+    /* ── Loading / Error ── */
+    .loading, .error {
+      text-align: center;
+      padding: 3rem 2rem;
+      opacity: 0.8;
+      font-size: 1rem;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 2.5px solid rgba(255,255,255,0.2);
+      border-top-color: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ── */
+    .source {
+      padding: 1rem 2rem;
+      font-size: 0.68rem;
+      font-weight: 500;
+      opacity: 0.3;
+      text-align: right;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      letter-spacing: 0.03em;
+    }
+  
