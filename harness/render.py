@@ -5,6 +5,7 @@ Pure Python, no JavaScript in the output. Same design as the original page.
 Usage:
   python3 harness/render.py   # reads fixtures/met_hamar.json
 """
+import csv
 import json
 import shutil
 from datetime import date, datetime, timedelta
@@ -40,8 +41,20 @@ def _base(code):
     return code
 
 
+def _load_names():
+    """Official Bokmål names from MET's legend.csv (metno/weathericons)."""
+    with open(ICONS / "legend.csv", encoding="utf-8") as fh:
+        return {row["Symbol ID"]: row["Bokmål"] for row in csv.DictReader(fh)}
+
+
+NAMES = _load_names()
+
+
 def symbol_label(code):
-    return _base(code).replace("_", " ") if code else "—"
+    if not code:
+        return "—"
+    base = _base(code)
+    return NAMES.get(base, base.replace("_", " ").capitalize())
 
 
 def symbol_emoji(code):
